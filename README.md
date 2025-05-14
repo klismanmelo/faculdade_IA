@@ -1,4 +1,4 @@
-# 2048 com Inteligência Artificial (Expectimax)
+# 2048 com Inteligência Artificial
 
 Este projeto é uma implementação do clássico jogo 2048 utilizando `pygame` e uma IA com o algoritmo **Expectimax** para tomada de decisões.
 
@@ -40,7 +40,7 @@ pip install pygame
 ### Executar o jogo
 
 ```bash
-python game_2048.py
+python main_ia_game.py
 ```
 
 ---
