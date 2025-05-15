@@ -1,50 +1,63 @@
-import tkinter as tk
-from tkinter import messagebox, Toplevel, Text, Scrollbar, END
+import pygame
+import sys
+import copy
 
 class JogoDaVelhaIA:
-    def __init__(self, root, ia_comeca=True):
-        self.root = root
-        self.root.title("Jogo da Velha - IA (X) vs Humano (O)")
+    def __init__(self, ia_comeca=True):
+        pygame.init()
+        self.tamanho = 600
+        self.tela = pygame.display.set_mode((self.tamanho, self.tamanho))
+        pygame.display.set_caption("Jogo da Velha - IA (X) vs Humano (O)")
 
+        self.fonte = pygame.font.SysFont(None, 100)
         self.jogador_humano = "O"
         self.jogador_ia = "X"
         self.tabuleiro = [["" for _ in range(3)] for _ in range(3)]
-        self.botoes = [[None for _ in range(3)] for _ in range(3)]
+        self.celula_tamanho = self.tamanho // 3
 
-        self.debug_info = []  # Aqui guardaremos os dados da árvore
+        self.debug_info = []
 
-        self.criar_interface()
-        self.criar_janela_debug()
-
+        self.jogo_ativo = True
         if ia_comeca:
             self.jogada_ia()
 
-    def criar_interface(self):
-        for linha in range(3):
-            for coluna in range(3):
-                botao = tk.Button(self.root, text="", font=("Arial", 32), width=5, height=2,
-                                  command=lambda l=linha, c=coluna: self.clique(l, c))
-                botao.grid(row=linha, column=coluna)
-                self.botoes[linha][coluna] = botao
+        self.loop_principal()
 
-    def criar_janela_debug(self):
-        self.debug_window = Toplevel(self.root)
-        self.debug_window.title("Árvore de Decisão da IA")
-        self.debug_text = Text(self.debug_window, wrap="word", width=50, height=30)
-        scrollbar = Scrollbar(self.debug_window, command=self.debug_text.yview)
-        self.debug_text.configure(yscrollcommand=scrollbar.set)
-        self.debug_text.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
+    def loop_principal(self):
+        while True:
+            for evento in pygame.event.get():
+                if evento.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
 
-    def clique(self, linha, coluna):
-        if self.tabuleiro[linha][coluna] == "":
-            self.tabuleiro[linha][coluna] = self.jogador_humano
-            self.botoes[linha][coluna].config(text=self.jogador_humano, state="disabled")
+                if evento.type == pygame.MOUSEBUTTONDOWN and self.jogo_ativo:
+                    x, y = evento.pos
+                    linha = y // self.celula_tamanho
+                    coluna = x // self.celula_tamanho
+                    if self.tabuleiro[linha][coluna] == "":
+                        self.tabuleiro[linha][coluna] = self.jogador_humano
+                        if self.verificar_fim(self.jogador_humano):
+                            continue
+                        self.jogada_ia()
 
-            if self.verificar_fim(self.jogador_humano):
-                return
+            self.desenhar_tabuleiro()
+            pygame.display.flip()
 
-            self.jogada_ia()
+    def desenhar_tabuleiro(self):
+        self.tela.fill((255, 255, 255))
+        # Linhas
+        for i in range(1, 3):
+            pygame.draw.line(self.tela, (0, 0, 0), (0, i * self.celula_tamanho), (self.tamanho, i * self.celula_tamanho), 5)
+            pygame.draw.line(self.tela, (0, 0, 0), (i * self.celula_tamanho, 0), (i * self.celula_tamanho, self.tamanho), 5)
+
+        # X e O
+        for i in range(3):
+            for j in range(3):
+                if self.tabuleiro[i][j] != "":
+                    texto = self.fonte.render(self.tabuleiro[i][j], True, (0, 0, 0))
+                    rect = texto.get_rect(center=(j * self.celula_tamanho + self.celula_tamanho // 2,
+                                                  i * self.celula_tamanho + self.celula_tamanho // 2))
+                    self.tela.blit(texto, rect)
 
     def jogada_ia(self):
         melhor_pontuacao = float('-inf')
@@ -68,7 +81,6 @@ class JogoDaVelhaIA:
         if melhor_jogada:
             i, j = melhor_jogada
             self.tabuleiro[i][j] = self.jogador_ia
-            self.botoes[i][j].config(text=self.jogador_ia, state="disabled")
             self.verificar_fim(self.jogador_ia)
 
     def minimax(self, tab, profundidade, maximizando, alfa, beta, caminho):
@@ -111,11 +123,15 @@ class JogoDaVelhaIA:
 
     def verificar_fim(self, jogador):
         if self.verificar_vitoria_simulada(self.tabuleiro, jogador):
-            messagebox.showinfo("Fim de jogo", f"{'IA' if jogador == self.jogador_ia else 'Você'} venceu!")
+            print(f"\n{'IA' if jogador == self.jogador_ia else 'Você'} venceu!")
+            self.jogo_ativo = False
+            pygame.time.delay(1500)
             self.reiniciar_jogo()
             return True
         elif self.verificar_empate_simulado(self.tabuleiro):
-            messagebox.showinfo("Fim de jogo", "Empate!")
+            print("\nEmpate!")
+            self.jogo_ativo = False
+            pygame.time.delay(1500)
             self.reiniciar_jogo()
             return True
         return False
@@ -137,20 +153,14 @@ class JogoDaVelhaIA:
 
     def reiniciar_jogo(self):
         self.tabuleiro = [["" for _ in range(3)] for _ in range(3)]
-        for i in range(3):
-            for j in range(3):
-                self.botoes[i][j].config(text="", state="normal")
-        self.debug_text.delete(1.0, END)
+        self.debug_info.clear()
+        self.jogo_ativo = True
         self.jogada_ia()
 
     def exibir_debug(self):
-        self.debug_text.delete(1.0, END)
-        self.debug_text.insert(END, "Árvore de decisão da IA (Minimax com Alfa-Beta):\n\n")
+        print("\nÁrvore de decisão da IA (Minimax com Alfa-Beta):")
         for caminho, score in self.debug_info:
-            self.debug_text.insert(END, f"{caminho}: {score}\n")
-
+            print(f"{caminho}: {score}")
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    jogo = JogoDaVelhaIA(root, ia_comeca=True)
-    root.mainloop()
+    JogoDaVelhaIA(ia_comeca=True)
