@@ -1,9 +1,9 @@
 import heapq
 
 def heuristic(a, b):
-    return abs(a[0] - b[0]) + abs(a[1] - b[1])  # Distância de Manhattan
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
-def astar(maze, start, goal):
+def astar(maze, cost_map, start, goal):
     open_set = []
     heapq.heappush(open_set, (0, start, [start]))
     g_score = {start: 0}
@@ -24,7 +24,10 @@ def astar(maze, start, goal):
             if (0 <= ny < len(maze) and 0 <= nx < len(maze[0]) and
                 maze[ny][nx] != '#' and neighbor not in visited):
 
-                tentative_g = g_score[current] + 1
+                tile = maze[ny][nx]
+                cost = cost_map.get(tile, 1)
+                tentative_g = g_score[current] + cost
+
                 if tentative_g < g_score.get(neighbor, float('inf')):
                     g_score[neighbor] = tentative_g
                     f_score = tentative_g + heuristic(neighbor, goal)
