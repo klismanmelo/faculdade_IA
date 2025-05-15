@@ -14,7 +14,6 @@ else:
 pygame.init()
 TILE_SIZE = 40
 
-# Mapa com dois caminhos válidos para E, um mais curto com blocos difíceis (.)
 MAP = [
     "####################",
     "#S    #        #   #",
@@ -40,7 +39,7 @@ COST_MAP = {
 ROWS = len(MAP)
 COLS = len(MAP[0])
 WIDTH = COLS * TILE_SIZE
-HEIGHT = ROWS * TILE_SIZE + 40  # espaço extra para HUD
+HEIGHT = ROWS * TILE_SIZE + 40
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -81,9 +80,9 @@ def draw_map():
             elif tile == 'E':
                 pygame.draw.rect(screen, RED, rect)
             elif tile == '.':
-                pygame.draw.rect(screen, (150, 150, 255), rect)  # azul claro para blocos difíceis
+                pygame.draw.rect(screen, (150, 150, 255), rect) 
             elif tile == '-':
-                pygame.draw.rect(screen, (50, 250, 255), rect)  # azul claro para blocos menos difíceis
+                pygame.draw.rect(screen, (50, 250, 255), rect)  
             else:
                 pygame.draw.rect(screen, WHITE, rect)
                 pygame.draw.rect(screen, GRAY, rect, 1)
@@ -130,7 +129,7 @@ while True:
             pygame.quit()
             sys.exit()
 
-        # Espaço inicia o caminho automático
+        
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 if USE_COST:
@@ -140,7 +139,7 @@ while True:
                 if path:
                     path_index = 1
                     auto_move = True
-                    energy = 100  # reseta energia
+                    energy = 100  
 
     keys = pygame.key.get_pressed()
     if not auto_move:
@@ -161,8 +160,8 @@ while True:
             player_x, player_y = next_x, next_y
             path_index += 1
         else:
-            auto_move = False  # ficou sem energia
+            auto_move = False 
     elif auto_move and path_index >= len(path):
-        auto_move = False  # chegou ao fim
+        auto_move = False
 
     pygame.display.flip()
