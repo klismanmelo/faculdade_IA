@@ -19,19 +19,20 @@ MAP = [
     "####################",
     "#S    #        #   #",
     "# ###.# ###### # # #",
-    "#   #.#      # # # #",
-    "### #.###### # # # #",
+    "#   #.#        # # #",
+    "### #.###### # #   #",
     "#   #........#   # #",
     "# #### ######### # #",
-    "#  ......... #   # #",
-    "###### # ### # ### #",
-    "#      #   #......E#",
+    "#  .........   ... #",
+    "###### # ### ##### #",
+    "#      #   # -----E#",
     "####################"
 ]
 
 COST_MAP = {
     " ": 1,
     ".": 5,
+    "-": 3,
     "S": 1,
     "E": 1
 }
@@ -81,18 +82,24 @@ def draw_map():
                 pygame.draw.rect(screen, RED, rect)
             elif tile == '.':
                 pygame.draw.rect(screen, (150, 150, 255), rect)  # azul claro para blocos difíceis
+            elif tile == '-':
+                pygame.draw.rect(screen, (50, 250, 255), rect)  # azul claro para blocos menos difíceis
             else:
                 pygame.draw.rect(screen, WHITE, rect)
                 pygame.draw.rect(screen, GRAY, rect, 1)
 
 def move_player(dx, dy):
-    global player_x, player_y
+    global player_x, player_y, energy
     new_x = player_x + dx
     new_y = player_y + dy
 
     if MAP[new_y][new_x] != '#':
-        player_x = new_x
-        player_y = new_y
+        cost = get_cost(new_x, new_y)
+        if energy >= cost:
+            player_x = new_x
+            player_y = new_y
+            energy -= cost
+
 
 def draw_path(path):
     for pos in path:
