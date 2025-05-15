@@ -10,15 +10,17 @@ class JogoDaVelhaIA:
         pygame.display.set_caption("Jogo da Velha - IA (X) vs Humano (O)")
 
         self.fonte = pygame.font.SysFont(None, 100)
+        self.fonte_mensagem = pygame.font.SysFont(None, 60)
         self.jogador_humano = "O"
         self.jogador_ia = "X"
-        self.tabuleiro = [["" for _ in range(3)] for _ in range(3)]
         self.celula_tamanho = self.tamanho // 3
 
         self.debug_info = []
-
+        self.turno_inicial_ia = ia_comeca
         self.jogo_ativo = True
-        if ia_comeca:
+        self.tabuleiro = [["" for _ in range(3)] for _ in range(3)]
+
+        if self.turno_inicial_ia:
             self.jogada_ia()
 
         self.loop_principal()
@@ -59,6 +61,13 @@ class JogoDaVelhaIA:
                                                   i * self.celula_tamanho + self.celula_tamanho // 2))
                     self.tela.blit(texto, rect)
 
+    def exibir_mensagem_final(self, mensagem):
+        texto = self.fonte_mensagem.render(mensagem, True, (0, 128, 0))
+        rect = texto.get_rect(center=(self.tamanho // 2, self.tamanho // 2))
+        self.tela.blit(texto, rect)
+        pygame.display.flip()
+        pygame.time.delay(2000)
+
     def jogada_ia(self):
         melhor_pontuacao = float('-inf')
         melhor_jogada = None
@@ -85,13 +94,10 @@ class JogoDaVelhaIA:
 
     def minimax(self, tab, profundidade, maximizando, alfa, beta, caminho):
         if self.verificar_vitoria_simulada(tab, self.jogador_ia):
-            self.debug_info.append((f"{caminho} (vitória IA)", 10 - profundidade))
             return 10 - profundidade
         elif self.verificar_vitoria_simulada(tab, self.jogador_humano):
-            self.debug_info.append((f"{caminho} (vitória jogador)", profundidade - 10))
             return profundidade - 10
         elif self.verificar_empate_simulado(tab):
-            self.debug_info.append((f"{caminho} (empate)", 0))
             return 0
 
         if maximizando:
@@ -123,15 +129,16 @@ class JogoDaVelhaIA:
 
     def verificar_fim(self, jogador):
         if self.verificar_vitoria_simulada(self.tabuleiro, jogador):
-            print(f"\n{'IA' if jogador == self.jogador_ia else 'Você'} venceu!")
+            vencedor = "IA venceu!" if jogador == self.jogador_ia else "Você venceu!"
+            print(f"\n{vencedor}")
             self.jogo_ativo = False
-            pygame.time.delay(1500)
+            self.exibir_mensagem_final(vencedor)
             self.reiniciar_jogo()
             return True
         elif self.verificar_empate_simulado(self.tabuleiro):
             print("\nEmpate!")
             self.jogo_ativo = False
-            pygame.time.delay(1500)
+            self.exibir_mensagem_final("Empate!")
             self.reiniciar_jogo()
             return True
         return False
@@ -155,7 +162,9 @@ class JogoDaVelhaIA:
         self.tabuleiro = [["" for _ in range(3)] for _ in range(3)]
         self.debug_info.clear()
         self.jogo_ativo = True
-        self.jogada_ia()
+        self.turno_inicial_ia = not self.turno_inicial_ia
+        if self.turno_inicial_ia:
+            self.jogada_ia()
 
     def exibir_debug(self):
         print("\nÁrvore de decisão da IA (Minimax com Alfa-Beta):")

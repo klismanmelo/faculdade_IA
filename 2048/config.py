@@ -1,4 +1,4 @@
 # config.py
 # ALGORITHM = "maxmin" 
-# ALGORITHM = "expectimax" 
-ALGORITHM = "montecarlo" 
+ALGORITHM = "expectimax" 
+# ALGORITHM = "montecarlo" 
