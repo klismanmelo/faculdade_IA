@@ -91,4 +91,4 @@ A pontuação do tabuleiro é calculada com uma heurística simples: **soma de t
 
 ## 📄 Licença
 
-MIT © [Seu Nome]
+MIT ©Klismanmelo

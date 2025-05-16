@@ -38,7 +38,7 @@ def evaluate(board):
         sum(sum(row) for row in board) * 0.01
     )
 
-def guided_rollout(board, max_depth=50):
+def guided_rollout(board, max_depth=100):
     board = copy.deepcopy(board)
     for _ in range(max_depth):
         if not has_moves(board):
