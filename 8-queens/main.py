@@ -1,5 +1,3 @@
-# main.py
-
 import pygame
 from game import Game  # Importa a classe Game que contém a lógica do jogo
 import os
