@@ -2,46 +2,50 @@ import random
 import time
 
 def gerar_estado_inicial():
-    # Gera um vetor de 8 colunas com linhas aleatórias (1 rainha por coluna)
+    # Gera uma configuração inicial aleatória
+    # Cada coluna tem exatamente uma rainha em uma linha aleatória (0 a 7)
     return [random.randint(0, 7) for _ in range(8)]
 
 def calcular_heuristica(estado):
-    # Conta quantas rainhas estão se atacando (pares de conflito)
+    # Calcula o número de pares de rainhas que se atacam
+    # Ou seja, rainhas na mesma linha ou na mesma diagonal
     conflitos = 0
     for i in range(8):
         for j in range(i + 1, 8):
-            # Mesma linha ou mesma diagonal
+            # Verifica se rainhas estão na mesma linha
+            # Ou na mesma diagonal (diferença entre linhas == diferença entre colunas)
             if estado[i] == estado[j] or abs(estado[i] - estado[j]) == abs(i - j):
                 conflitos += 1
     return conflitos
 
 def vizinhos(estado):
-    # Gera todos os vizinhos possíveis movendo 1 rainha para outra linha
+    # Gera todos os estados vizinhos possíveis
+    # Movendo uma rainha para qualquer outra linha na mesma coluna
     vizinhos = []
     for col in range(8):
         for row in range(8):
-            if estado[col] != row:
-                novo_estado = estado.copy()
-                novo_estado[col] = row
-                vizinhos.append(novo_estado)
+            if estado[col] != row:  # Evita gerar o estado atual novamente
+                novo_estado = estado.copy()  # Copia o estado atual para modificar
+                novo_estado[col] = row  # Move a rainha da coluna para a nova linha
+                vizinhos.append(novo_estado)  # Adiciona o novo estado à lista
     return vizinhos
 
 def subida_de_encosta_com_reinicio():
-    inicio_tempo = time.time()
-    iteracoes = 0
-    reinicios = 0
+    inicio_tempo = time.time()  # Marca o tempo inicial para medir duração
+    iteracoes = 0  # Conta o número total de iterações
+    reinicios = 0  # Conta quantas vezes o algoritmo precisou reiniciar
 
     while True:
-        estado_atual = gerar_estado_inicial()
-        heuristica_atual = calcular_heuristica(estado_atual)
+        estado_atual = gerar_estado_inicial()  # Gera um estado inicial aleatório
+        heuristica_atual = calcular_heuristica(estado_atual)  # Calcula conflitos no estado atual
 
         while True:
             iteracoes += 1
-            vizinhos_estado = vizinhos(estado_atual)
-            melhor_vizinho = estado_atual
-            melhor_heuristica = heuristica_atual
+            vizinhos_estado = vizinhos(estado_atual)  # Gera todos os vizinhos possíveis
+            melhor_vizinho = estado_atual  # Inicializa melhor vizinho como o estado atual
+            melhor_heuristica = heuristica_atual  # Inicializa melhor heurística com a atual
 
-            # Busca o vizinho com menor heurística
+            # Procura entre os vizinhos o estado com menor número de conflitos
             for viz in vizinhos_estado:
                 h = calcular_heuristica(viz)
                 if h < melhor_heuristica:
@@ -49,6 +53,7 @@ def subida_de_encosta_com_reinicio():
                     melhor_heuristica = h
 
             if melhor_heuristica == 0:
+                # Solução perfeita encontrada (nenhuma rainha se ataca)
                 fim_tempo = time.time()
                 print("✅ Solução encontrada!")
                 print("Estado final:", melhor_vizinho)
@@ -59,12 +64,14 @@ def subida_de_encosta_com_reinicio():
                 return melhor_vizinho
 
             if melhor_heuristica >= heuristica_atual:
-                # Ficou preso em ótimo local, faz reinício
+                # Ficou preso em um ótimo local (não melhorou)
+                # Faz reinício gerando um novo estado inicial aleatório
                 reinicios += 1
-                break  # sai do loop interno e reinicia com novo estado
+                break  # Sai do loop interno para reiniciar
 
+            # Atualiza o estado atual para o melhor vizinho encontrado
             estado_atual = melhor_vizinho
             heuristica_atual = melhor_heuristica
 
 if __name__ == "__main__":
-    subida_de_encosta_com_reinicio()
+    subida_de_encosta_com_reinicio()  # Executa o algoritmo quando rodar o arquivo
