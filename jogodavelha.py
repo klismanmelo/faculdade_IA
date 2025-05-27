@@ -102,9 +102,9 @@ class JogoDaVelhaIA:
         # Itera sobre todas as posições possíveis
         for i in range(3):
             for j in range(3):
-                if self.tabuleiro[i][j] == "":
+                if self.tabuleiro[i][j] == "": # Posições vazias
                     self.tabuleiro[i][j] = self.jogador_ia  # Simula jogada da IA
-                    pontuacao = self.minimax(self.tabuleiro, 0, False, float('-inf'), float('inf'), f"{i},{j}")
+                    pontuacao = self.minimax(self.tabuleiro, 0, False, float('-inf'), float('inf'), f"{i},{j}") # Pega a pontução da função MINMAX
                     self.tabuleiro[i][j] = ""  # Desfaz jogada simulada
                     self.debug_info.append((f"Raiz {i},{j}", pontuacao))
 
@@ -128,13 +128,13 @@ class JogoDaVelhaIA:
         elif self.verificar_empate_simulado(tab):
             return 0
 
-        if maximizando:
+        if maximizando: # IA maximiza suas chances de vitórias - vez da IA
             melhor = float('-inf')
             for i in range(3):
                 for j in range(3):
-                    if tab[i][j] == "":
-                        tab[i][j] = self.jogador_ia
-                        valor = self.minimax(tab, profundidade + 1, False, alfa, beta, caminho + f" -> {i},{j}")
+                    if tab[i][j] == "": # Só joga em casa vazias
+                        tab[i][j] = self.jogador_ia # Simula jogada da IA
+                        valor = self.minimax(tab, profundidade + 1, False, alfa, beta, caminho + f" -> {i},{j}") # Recursividade sendo a vez do jogador
                         tab[i][j] = ""
                         melhor = max(melhor, valor)
                         alfa = max(alfa, valor)
@@ -142,12 +142,12 @@ class JogoDaVelhaIA:
                             break  # Poda alfa-beta
             return melhor
         else:
-            pior = float('inf')
+            pior = float('inf') # Minimiza as chances de derrota -> vez do Jogador
             for i in range(3):
                 for j in range(3):
-                    if tab[i][j] == "":
-                        tab[i][j] = self.jogador_humano
-                        valor = self.minimax(tab, profundidade + 1, True, alfa, beta, caminho + f" -> {i},{j}")
+                    if tab[i][j] == "": # Só joga em casa vazias
+                        tab[i][j] = self.jogador_humano # Simula jogada do Jogador
+                        valor = self.minimax(tab, profundidade + 1, True, alfa, beta, caminho + f" -> {i},{j}") # Recursividade sendo a vez da IA
                         tab[i][j] = ""
                         pior = min(pior, valor)
                         beta = min(beta, valor)
