@@ -28,10 +28,10 @@ class Puzzle8:
             if val == 0:
                 continue  # Não considera o espaço vazio (0)
             goal_idx = self.goal_positions[val]  # Posição alvo do valor atual
-            current_row, current_col = divmod(i, 3)  # Coordenadas atuais da peça
+            current_row, current_col = divmod(i, 3)  # Coordenadas atuais da peça  -> retorna uma tupla com dois valores (O quociente da divisão inteira de a por b & O resto dessa divisão)
             goal_row, goal_col = divmod(goal_idx, 3)  # Coordenadas da posição alvo
             # Soma as distâncias horizontais e verticais (Manhattan)
-            distance += abs(current_row - goal_row) + abs(current_col - goal_col)
+            distance += abs(current_row - goal_row) + abs(current_col - goal_col) # Valor absoluto
         return distance
 
     def astar(self):
@@ -43,8 +43,8 @@ class Puzzle8:
         goal = self.goal_state
 
         # Fila de prioridade contendo tuplas: (custo estimado total, custo atual, estado atual, caminho até aqui)
-        queue = []
-        heapq.heappush(queue, (self.heuristic(start), 0, start, []))
+        queue = [] # Cria uma fila de prioridade
+        heapq.heappush(queue, (self.heuristic(start), 0, start, []))  # Transforma uma lista comum em uma heap (fila de prioridade)
 
         # Dicionário para guardar o menor custo já encontrado para cada estado
         visited = {}
